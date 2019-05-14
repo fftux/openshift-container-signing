@@ -5,7 +5,7 @@ Verify vars are correct by overridding them or changing the default values.  I.e
 Then run the playbook as follows, or as appropriate for your environment.
 ansible-playbook -kKbu sysadmin openshift-container-signing.yml
 
-# Sign image (from basebox)
+# Sign image (from registry)
 ## List images in registry
 curl -X GET http://registry.example.com:5000/v2/_catalog
 
