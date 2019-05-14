@@ -29,7 +29,7 @@
   when: (create_demo_key == true) and (gpg_key_exists is failed)
 
 - name: Export signer key to file
-  command: "gpg --output /root/{{ signer_key_pub }} --armor --export acs-testing@spawar.navy.mil"
+  command: "gpg --output /root/{{ signer_key_pub }} --armor --export testing@example.com"
   when: (create_demo_key == true) and (gpg_key_exists is failed)
 
 - name: Ensure httpd is installed
