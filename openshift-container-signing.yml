@@ -1,7 +1,7 @@
 ---
 - hosts: registry
   roles:
-  - openshift_container_signing_basebox
+  - openshift_container_signing_registry
 
 - hosts: nodes
   roles:
