@@ -1,9 +1,9 @@
 # openshift-container-signing
 # How to deploy
-Verify vars are correct by overridding them or changing the default values.  I.e. change the domain name for the registry.
+Verify vars are correct by overridding them or changing the default values.  I.e. change the domain name for the registry. Registry must also be defined in the ansible hosts file.
 
 Then run the playbook as follows, or as appropriate for your environment.
-ansible-playbook -kKbu sysadmin openshift-container-signing.yml
+ansible-playbook openshift-container-signing.yml
 
 # Sign image (from registry)
 ## List images in registry
