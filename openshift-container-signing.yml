@@ -1,0 +1,8 @@
+---
+- hosts: registry
+  roles:
+  - openshift_container_signing_basebox
+
+- hosts: nodes
+  roles:
+  - openshift_container_signing_nodes

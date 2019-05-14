@@ -1,0 +1,17 @@
+# TEMPLATES
+# This is a default registries.d configuration file.  You may
+# add to this file or create additional files in registries.d/.
+#
+# sigstore: indicates a location that is read and write
+# sigstore-staging: indicates a location that is only for write
+#
+# sigstore and sigstore-staging take a value of the following:
+#   sigstore:  {schema}://location
+#
+# For reading signatures, schema may be http, https, or file.
+# For writing signatures, schema may only be file.
+
+docker:
+  {{ docker_registry_server }}:
+    sigstore: {{ docker_signature_store }}{{ docker_signature_store_path }}
+    sigstore-staging: file://{{ docker_signature_store_staging }}

@@ -1,0 +1,51 @@
+---
+- name: Ensure skopeo is installed on all nodes to sign containers
+  yum:
+    name: skopeo
+    state: present
+
+- name: Ensure file directory structure exists
+  file:
+    state: directory
+    owner: root
+    group: root
+    path: "/root/.gnupg/"
+
+- name: Check for key existing
+  command: "gpg --list-keys | grep 'Testing Key'"
+  register: gpg_key_exists
+  ignore_errors: True
+
+- name: "Copy key definition file if demo keys are desired"
+  template:
+    src: testing.keyfile.j2
+    dest: "/root/testing.keyfile"
+    owner: root
+    group: root
+  when: (create_demo_key == true) and (gpg_key_exists is failed)
+
+- name: Create a demo signing key
+  command: "gpg --batch --gen-key /root/testing.keyfile"
+  when: (create_demo_key == true) and (gpg_key_exists is failed)
+
+- name: Export signer key to file
+  command: "gpg --output /root/{{ signer_key_pub }} --armor --export acs-testing@spawar.navy.mil"
+  when: (create_demo_key == true) and (gpg_key_exists is failed)
+
+- name: Ensure httpd is installed
+  yum:
+    name: httpd
+    state: present
+
+- name: Setup http sigstore
+  template:
+    src: sigstore.conf.j2
+    dest: "/etc/httpd/conf.d/sigstore.conf"
+    owner: root
+    group: root
+
+- name: Restart httpd
+  service:
+    name: httpd
+    state: restarted
+    enabled: true

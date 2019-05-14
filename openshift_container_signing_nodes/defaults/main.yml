@@ -1,0 +1,10 @@
+---
+# VARS
+#Openshift Container Signing
+docker_registry_server: "registry.example.com:5000"
+docker_signature_store: "http://registry.example.com"
+docker_signature_store_path: "/sigstore/"
+docker_signature_store_staging: "/var/lib/atomic/sigstore"
+create_demo_key: true
+
+signer_key_pub: "testing.pub"

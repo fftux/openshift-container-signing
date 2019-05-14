@@ -1,0 +1,58 @@
+---
+#TASKS
+#Openshift Container Signing - Clients (Openshift nodes)
+- name: Ensure skopeo is installed on all nodes to sign containers
+  yum:
+    name: skopeo
+    state: present
+
+- name: Ensure file directory structure exists
+  file:
+    state: directory
+    owner: root
+    group: root
+    path: "/root/.gnupg/"
+    
+- name: Check for key existing
+  command: "gpg --list-keys | grep 'Testing Key'"
+  register: gpg_key_exists
+  ignore_errors: True
+
+- name: Copy signed key
+  copy:
+    src: "/root/{{ signer_key_pub }}"
+    dest: "/root/{{ signer_key_pub }}"
+    owner: root
+    group: root
+  when: (create_demo_key == true) and (gpg_key_exists is failed)
+
+- name: Import signed key
+  command: "gpg2 --import /root/{{ signer_key_pub }}"
+  when: (create_demo_key == true) and (gpg_key_exists is failed)
+
+- name: Add container signature store to "/etc/containers/registries.d/"
+  template:
+    src: registry.yaml.j2
+    dest: "/etc/containers/registries.d/registry.yaml"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Update containers policy to reject unsigned containers
+  template:
+    src: policy.json.j2
+    dest: "/etc/containers/policy.json"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Ensure signiture verification is set to true in /etc/sysconfig/docker
+  lineinfile:
+    dest: /etc/sysconfig/docker
+    regexp: ^OPTIONS=.*
+    line: OPTIONS='--selinux-enabled --signature-verification=true'
+
+- name: 
+  service: 
+    name: docker
+    state: restarted

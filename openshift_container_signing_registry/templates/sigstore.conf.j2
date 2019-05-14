@@ -1,0 +1,11 @@
+<VirtualHost *:80>
+
+  ServerName "{{ docker_registry_server }}"
+  DocumentRoot /var/lib/atomic
+  DirectoryIndex index.html
+
+  <Directory /var/lib/atomic/>
+    Options +Indexes
+    Require all granted
+  </Directory>
+</VirtualHost>
