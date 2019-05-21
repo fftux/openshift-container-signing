@@ -30,7 +30,8 @@ docker://registry.example.com:5000/rhscl/postgresql-96-rhel7:signed
 
 ### Verify image digest matches
 ```sh
-skopeo inspect --tls-verify=false docker://registry.example.com:5000/rhscl/postgresql-96-rhel7:signed | grep Digest
+skopeo inspect --tls-verify=false \
+docker://registry.example.com:5000/rhscl/postgresql-96-rhel7:signed | grep Digest
 ll /var/lib/atomic/sigstore/rhscl/
 curl http://registry.example.com/sigstore/rhscl/
 ```
@@ -49,7 +50,8 @@ oc new-project signed-images
 
 ### Create new app
 ```sh
-oc new-app --insecure-registry=true --docker-image=registry.example.com:5000/rhscl/postgresql-96-rhel7:1-32 --name=signed-pgsql
+oc new-app --insecure-registry=true \
+--docker-image=registry.example.com:5000/rhscl/postgresql-96-rhel7:1-32 --name=signed-pgsql
 ```
 
 ## Notes
@@ -62,9 +64,14 @@ docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
 ### Policies for online registries
 If the cluster is online, the following commands will setup policies for online registries.  The Red Hat registries can be configured for signature verification.
 ```sh
+## policy for docker.io
 atomic --assumeyes trust add docker.io --type insecureAcceptAnything
-atomic --assumeyes trust add --sigstoretype web --sigstore https://access.redhat.com/webassets/docker/content/sigstore \
+## policy for registry.access.redhat.com
+atomic --assumeyes trust add --sigstoretype web \
+--sigstore https://access.redhat.com/webassets/docker/content/sigstore \
 --pubkeys /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release registry.access.redhat.com
-atomic --assumeyes trust add --sigstoretype web --sigstore https://access.redhat.com/webassets/docker/content/sigstore \
+## policy for registry.redhat.io
+atomic --assumeyes trust add --sigstoretype web \
+--sigstore https://access.redhat.com/webassets/docker/content/sigstore \
 --pubkeys /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release registry.redhat.io
 ```
