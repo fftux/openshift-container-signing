@@ -2,6 +2,8 @@
 ## Assumptions
 This repository assumes that you plan to deploy an external registry, where you will sign all container images in the registry with your own GPG key.  This may be used for an offline installation, where this registry holds all of the necessary containers images for installation.  Alternatively, it may be simply used for custom images.
 
+Additionally, this repo assumes that the registry server is used as the control node.  This, of course, can easily be changed, but that is how the roles are currently written.  
+
 ## How to deploy
 Verify vars are correct by overridding them or changing the default values.  I.e. change the domain name for the registry. Registry must also be defined in the ansible hosts file.
 
