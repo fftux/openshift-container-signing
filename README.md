@@ -80,30 +80,30 @@ If the cluster is online, the following commands will setup policies for online 
 
 docker.io:
 ```sh
-atomic --assumeyes trust add docker.io --type insecureAcceptAnything
+ansible nodes -m command -a "atomic --assumeyes trust add docker.io --type insecureAcceptAnything"
 ```
 registry.access.redhat.com:
 ```sh
-atomic --assumeyes trust add --sigstoretype web \
+ansible nodes -m command -a "atomic --assumeyes trust add --sigstoretype web \
 --sigstore https://access.redhat.com/webassets/docker/content/sigstore \
---pubkeys /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release registry.access.redhat.com
+--pubkeys /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release registry.access.redhat.com"
 ```
 registry.redhat.io:
 ```sh
-atomic --assumeyes trust add --sigstoretype web \
+ansible nodes -m command -a "atomic --assumeyes trust add --sigstoretype web \
 --sigstore https://access.redhat.com/webassets/docker/content/sigstore \
---pubkeys /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release registry.redhat.io
+--pubkeys /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release registry.redhat.io"
 ```
 
 #### Override Default Policy
 This may be helpful if you are troubleshooting or need to pull in something that is not signed to do some local testing on a host.
 
 ```sh
-atomic --assumeyes trust default accept
+ansible nodes -m command -a "atomic --assumeyes trust default accept"
 ```
 
 The same command can be used, swapping `accept` for `reject`, to reaplly the default reject policy.
 
 ```sh
-atomic --assumeyes trust default reject
+ansible nodes -m command -a "atomic --assumeyes trust default reject"
 ```
