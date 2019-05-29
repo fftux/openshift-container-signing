@@ -29,6 +29,7 @@ curl -X GET http://registry.example.com:5000/v2/rhscl/postgresql-96-rhel7/tags/l
 ```
 
 ### Use scopeo to copy signed image to registry
+Since we have configured generated and stored the private key in root's keyring, we will need to run this as root or use `sudo`.
 ```sh
 skopeo copy --sign-by testing@example.com --src-tls-verify=false --dest-tls-verify=false \
 docker://registry.example.com:5000/rhscl/postgresql-96-rhel7:1-32 \
@@ -76,15 +77,33 @@ docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
 
 ### Policies for online registries
 If the cluster is online, the following commands will setup policies for online registries.  The Red Hat registries can be configured for signature verification.
+
+docker.io:
 ```sh
-## policy for docker.io
 atomic --assumeyes trust add docker.io --type insecureAcceptAnything
-## policy for registry.access.redhat.com
+```
+registry.access.redhat.com:
+```sh
 atomic --assumeyes trust add --sigstoretype web \
 --sigstore https://access.redhat.com/webassets/docker/content/sigstore \
 --pubkeys /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release registry.access.redhat.com
-## policy for registry.redhat.io
+```
+registry.redhat.io:
+```sh
 atomic --assumeyes trust add --sigstoretype web \
 --sigstore https://access.redhat.com/webassets/docker/content/sigstore \
 --pubkeys /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release registry.redhat.io
+```
+
+#### Override Default Policy
+This may be helpful if you are troubleshooting or need to pull in something that is not signed to do some local testing on a host.
+
+```sh
+atomic --assumeyes trust default accept
+```
+
+The same command can be used, swapping `accept` for `reject`, to reaplly the default reject policy.
+
+```sh
+atomic --assumeyes trust default reject
 ```
