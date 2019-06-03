@@ -28,8 +28,14 @@
   command: "gpg --batch --gen-key /root/testing.keyfile"
   when: (create_demo_key == true) and (gpg_key_exists is failed)
 
+- name: Ensure pubkey directory exists
+  file:
+    path: /etc/pki/containers
+    state: directory
+    mode: '0755'
+
 - name: Export signer key to file
-  command: "gpg --output /root/{{ signer_key_pub }} --armor --export testing@example.com"
+  command: "gpg --output /etc/pki/containers/{{ signer_key_pub }} --armor --export testing@example.com"
   when: (create_demo_key == true) and (gpg_key_exists is failed)
 
 - name: Ensure httpd is installed

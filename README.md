@@ -2,8 +2,15 @@
 ## Assumptions
 This repository assumes that you plan to deploy an external registry, where you will sign all container images in the registry with your own GPG key.  This may be used for an offline installation, where this registry holds all of the necessary containers images for installation.  Alternatively, it may be simply used for custom images.
 
+Additionally, this repo assumes that the registry server is used as the control node.  This, of course, can easily be changed, but that is how the roles are currently written.  
+
 ## How to deploy
 Verify vars are correct by overridding them or changing the default values.  I.e. change the domain name for the registry. Registry must also be defined in the ansible hosts file.
+
+Pull down the code.
+```sh
+git clone -b $BRANCH https://github.com/chopskxw/openshift-container-signing.git [$WORKING_DIR]
+```
 
 Then run the playbook as follows, or as appropriate for your environment.
 ```sh
@@ -22,10 +29,17 @@ curl -X GET http://registry.example.com:5000/v2/rhscl/postgresql-96-rhel7/tags/l
 ```
 
 ### Use scopeo to copy signed image to registry
+Since we have configured generated and stored the private key in root's keyring, we will need to run this as root or use `sudo`.
 ```sh
 skopeo copy --sign-by testing@example.com --src-tls-verify=false --dest-tls-verify=false \
 docker://registry.example.com:5000/rhscl/postgresql-96-rhel7:1-32 \
 docker://registry.example.com:5000/rhscl/postgresql-96-rhel7:signed
+```
+Or, if pulling from Red Hat.
+```sh
+skopeo copy --remove-signatures --sign-by testing@example.com --dest-tls-verify=false \
+docker://registry.redhat.io/rhel7/etcd \
+docker://registry.williamscomplex.local:5000/signed/etcd
 ```
 
 ### Verify image digest matches
@@ -63,15 +77,33 @@ docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
 
 ### Policies for online registries
 If the cluster is online, the following commands will setup policies for online registries.  The Red Hat registries can be configured for signature verification.
+
+docker.io:
 ```sh
-## policy for docker.io
-atomic --assumeyes trust add docker.io --type insecureAcceptAnything
-## policy for registry.access.redhat.com
-atomic --assumeyes trust add --sigstoretype web \
+ansible nodes -m command -a "atomic --assumeyes trust add docker.io --type insecureAcceptAnything"
+```
+registry.access.redhat.com:
+```sh
+ansible nodes -m command -a "atomic --assumeyes trust add --sigstoretype web \
 --sigstore https://access.redhat.com/webassets/docker/content/sigstore \
---pubkeys /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release registry.access.redhat.com
-## policy for registry.redhat.io
-atomic --assumeyes trust add --sigstoretype web \
+--pubkeys /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release registry.access.redhat.com"
+```
+registry.redhat.io:
+```sh
+ansible nodes -m command -a "atomic --assumeyes trust add --sigstoretype web \
 --sigstore https://access.redhat.com/webassets/docker/content/sigstore \
---pubkeys /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release registry.redhat.io
+--pubkeys /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release registry.redhat.io"
+```
+
+#### Override Default Policy
+This may be helpful if you are troubleshooting or need to pull in something that is not signed to do some local testing on a host.
+
+```sh
+ansible nodes -m command -a "atomic --assumeyes trust default accept"
+```
+
+The same command can be used, swapping `accept` for `reject`, to reaplly the default reject policy.
+
+```sh
+ansible nodes -m command -a "atomic --assumeyes trust default reject"
 ```

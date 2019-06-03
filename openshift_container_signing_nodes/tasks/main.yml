@@ -18,22 +18,28 @@
   register: gpg_key_exists
   ignore_errors: True
 
+- name: Ensure pubkey directory exists
+  file:
+    path: /etc/pki/containers
+    state: directory
+    mode: '0755'
+
 - name: Copy signed key
   copy:
-    src: "/root/{{ signer_key_pub }}"
-    dest: "/root/{{ signer_key_pub }}"
+    src: "/etc/pki/containers/{{ signer_key_pub }}"
+    dest: "/etc/pki/containers/{{ signer_key_pub }}"
     owner: root
     group: root
   when: (create_demo_key == true) and (gpg_key_exists is failed)
 
 - name: Import signed key
-  command: "gpg2 --import /root/{{ signer_key_pub }}"
+  command: "gpg2 --import /etc/pki/containers/{{ signer_key_pub }}"
   when: (create_demo_key == true) and (gpg_key_exists is failed)
 
 - name: Add container signature store to "/etc/containers/registries.d/"
   template:
     src: registry.yaml.j2
-    dest: "/etc/containers/registries.d/registry.yaml"
+    dest: "/etc/containers/registries.d/{{ docker_registry_server }}.yaml"
     owner: root
     group: root
     mode: 0644
