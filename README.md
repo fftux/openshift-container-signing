@@ -107,3 +107,6 @@ The same command can be used, swapping `accept` for `reject`, to reaplly the def
 ```sh
 ansible nodes -m command -a "atomic --assumeyes trust default reject"
 ```
+
+## Author
+The contents of this repo were originally authored by Ryan Bontreger <bontreger@redhat.com>, then later modified by Roy Williams <roywilliams@redhat.com>.
