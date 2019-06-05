@@ -39,7 +39,7 @@ Or, if pulling from Red Hat.
 ```sh
 skopeo copy --remove-signatures --sign-by testing@example.com --dest-tls-verify=false \
 docker://registry.redhat.io/rhel7/etcd \
-docker://registry.williamscomplex.local:5000/signed/etcd
+docker://registry.example.com:5000/signed/etcd
 ```
 
 ### Verify image digest matches
