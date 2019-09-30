@@ -1,3 +1,5 @@
+We made a change!
+
 # openshift-container-signing
 ## Assumptions
 This repository assumes that you plan to deploy an external registry, where you will sign all container images in the registry with your own GPG key.  This may be used for an offline installation, where this registry holds all of the necessary containers images for installation.  Alternatively, it may be simply used for custom images.
